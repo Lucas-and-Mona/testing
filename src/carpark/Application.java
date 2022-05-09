@@ -1,6 +1,7 @@
 package carpark;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -9,7 +10,12 @@ public class Application {
     static CarPark carPark = new CarPark();
     static ArrayList<ParkingSlot> parkingSlot = carPark.listAllSlots();
     public static void main(String[] args) {
+        selectMenu();
+    }
+
+    public static void selectMenu(){
         Scanner sc = new Scanner(System.in);
+
 
         addCarSlot1(sc,carPark);    //let user create car park when first entering the system
         //option hints
@@ -57,10 +63,9 @@ public class Application {
                 }
             }else {
                 System.out.println("Please only type 1 to 7 to choose.");
-                }
+            }
         }
     }
-
 
     public static void showAllSlot() {
         for (int i = 0; i < parkingSlot.size(); i++) {
@@ -157,7 +162,7 @@ public class Application {
         }
     }
 
-    private static void findACar(Scanner sc) {
+    public static void findACar(Scanner sc) {
         String searchCar = null;
         boolean flag1 = true;
         while (flag1) {
@@ -179,8 +184,7 @@ public class Application {
 
 
 
-    private static void removeACar(Scanner sc) {
-
+    public static void removeACar(Scanner sc) {
         String searchCar = null;
         boolean flag5 = true;
         while (flag5) {
@@ -208,8 +212,10 @@ public class Application {
 
 
     public static void addCarSlot1(Scanner sc, CarPark carPark) {
-        System.out.println("Please enter the number of slots for staff: ");
-        int staffSlot = sc.nextInt();
+
+        int staffSlot = Integer.parseInt(JOptionPane.showInputDialog("Please enter the number of slots for staff: "));
+//        System.out.println("Please enter the number of slots for staff: ");
+//        int staffSlot = sc.nextInt();
         System.out.println("Please enter the number of slots for staff: ");
         int visitorSlot = sc.nextInt();
         String occupation = "not occupied";

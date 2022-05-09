@@ -16,7 +16,7 @@ public class CarPark {
         return null;
     }
 
-    ArrayList<ParkingSlot> listAllSlots(){
+    public ArrayList<ParkingSlot> listAllSlots(){
         return parkingSlots;
     }
 
