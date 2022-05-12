@@ -2,34 +2,77 @@ package carpark;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.Scanner;
 
 import static carpark.Application.*;
-import static carpark.applicationGUI.sc;
 
 public class GUIPanel extends JFrame{
+    static JFrame frame;
+    static JPanel panel_content_top;
+    static JPanel panel_content_bottom;
+    static JPanel createSlot;
+    static JPanel panel_btn;
+    static JPanel panel_welcome_info;
+    static JButton confirmCreate;
+    static JButton[] labels;
+    static Scanner sc;
+    static JTextField staffSlots;
+    static JTextField visitorSlots;
+    static JLabel hints;
+
     public GUIPanel(){
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        Container container = this.getContentPane();
+        container.setLayout(null);
+//        container.add(frame);
     }
 
     public static void main(String[] args){
 
 //        define frame and set sizes
-        JFrame frame = new JFrame();
-        JPanel panel_btn = new JPanel();
-
+        frame = new JFrame();
         frame.setLayout(null);
-        frame.setBounds(300, 300, 1000, 800);
+//        frame.setBounds(300, 300, 1000, 800);
+        frame.setMinimumSize(new Dimension(1000, 800));
         frame.setBackground(new Color(171, 180, 207));
 
 //        define panel container
-        panel_btn.setBounds(0, 0, 150, 900);
+        panel_btn = new JPanel();
+        panel_welcome_info = new JPanel();
+        panel_content_top = new JPanel();
+        panel_content_bottom = new JPanel();
+        panel_content_bottom.setLayout(new FlowLayout());
+
+        panel_btn.setBounds(0, 0, 150, 800);
+        panel_welcome_info.setBounds(150, 0, 850, 100);
+        panel_content_top.setBounds(150, 100, 850, 100);
+        panel_content_bottom.setBounds(150, 400, 850, 500);
         panel_btn.setBackground(new Color(147, 159, 197));
+
+        panel_content_top.setBackground(new Color(141, 119, 140));
+        panel_content_bottom.setBackground(new Color(200, 170, 198));
+        panel_welcome_info.setBackground(new Color(181,202,12));
+
+//        define a label
+        JLabel welcomeLabel = new JLabel("Welcome to lucas car park");
+        welcomeLabel.setBounds(160, 0, 200, 100);
+//        welcomeLabel.setPreferredSize(new Dimension(200, 100));
+
+        //labels for slots
+        labels = new JButton[28];
+
+        for (int i=0; i<28; i++){
+            labels[i] = new JButton();
+            labels[i].setPreferredSize(new Dimension(400,40));
+            labels[i].setBackground(new Color(171, 180, 207));
+            labels[i].setText("label"+i);
+            panel_content_bottom.add(labels[i]);
+            labels[i].setVisible(true);
+        }
+
 
 //        Define buttons and set sizes
         JButton showAll = new JButton("Show All Parking Slot");
@@ -49,7 +92,38 @@ public class GUIPanel extends JFrame{
         JButton clearScreen = new JButton("Clear Screen");
         clearScreen.setPreferredSize(new Dimension(140, 90));
 
-        //attach event listeners to buttons
+//      create multiple input window
+        createSlot = new JPanel();
+        createSlot.setBackground(new Color(237, 219, 235));
+        createSlot.setBounds(150, 250, 790, 200);
+        createSlot.setLayout(new FlowLayout());
+        JLabel newStaff = new JLabel("Staff slot quantity: ");
+        newStaff.setPreferredSize(new Dimension(150, 30));
+        JLabel newVisitor = new JLabel("Visitor slot quantity: ");
+        newVisitor.setPreferredSize(new Dimension(150, 30));
+        hints = new JLabel("There is no parking slot in the car park, please enter the quantity of staff and vistor slots to be created.");
+        hints.setBackground(new Color(141, 119, 140));
+        hints.setPreferredSize(new Dimension(700, 30));
+
+        confirmCreate = new JButton("confirm");
+        confirmCreate.setPreferredSize(new Dimension(90, 30));
+
+        staffSlots = new JTextField();
+        staffSlots.setBackground(new Color(237, 202, 235));
+        staffSlots.setPreferredSize(new Dimension(160, 30));
+        visitorSlots = new JTextField();
+        visitorSlots.setBackground(new Color(237, 202, 235));
+        visitorSlots.setPreferredSize(new Dimension(160, 30));
+
+        createSlot.add(hints, BorderLayout.NORTH);
+        createSlot.add(newStaff);
+        createSlot.add(staffSlots);
+        createSlot.add(Box.createHorizontalStrut(20));
+        createSlot.add(newVisitor);
+        createSlot.add(visitorSlots);
+        createSlot.add(confirmCreate);
+
+//      attach event listeners to buttons
         ShowAllListener showAllListener = new ShowAllListener();
         showAll.addActionListener(showAllListener);
 
@@ -65,8 +139,8 @@ public class GUIPanel extends JFrame{
         RemoveCarListener removeCarListener = new RemoveCarListener();
         removeCar.addActionListener(removeCarListener);
 
-        AddParkingSlotListener addParkingSlotListener = new AddParkingSlotListener();
-        addParkingSlot.addActionListener(addParkingSlotListener);
+        AddParkingSlotListener2 addParkingSlotListener2 = new AddParkingSlotListener2();
+        addParkingSlot.addActionListener(addParkingSlotListener2);
 
         ExitApplicationListener exitApplicationListener = new ExitApplicationListener();
         exitApplication.addActionListener(exitApplicationListener);
@@ -74,15 +148,8 @@ public class GUIPanel extends JFrame{
         ClearScreenListener clearScreenListener = new ClearScreenListener();
         clearScreen.addActionListener(clearScreenListener);
 
-//        EventMonitor eventMonitor = new EventMonitor();
-//        showAll.setActionCommand("showAll");
-//        findCar.setActionCommand("findCar");
-//        parkCar.setActionCommand("parkCar");
-//        deleteSlot.setActionCommand("deleteSlot");
-//        removeCar.setActionCommand("removeCar");
-//        addParkingSlot.setActionCommand("addParkingSlot");
-//        exitApplication.setActionCommand("exitApplication");
-
+        AddParkingSlotListener1 addParkingSlotListener1 = new AddParkingSlotListener1();
+        confirmCreate.addActionListener(addParkingSlotListener1);
 
 
 //        add buttons to panel
@@ -95,42 +162,27 @@ public class GUIPanel extends JFrame{
         panel_btn.add(exitApplication);
         panel_btn.add(clearScreen);
 
+        panel_welcome_info.add(welcomeLabel);
+        panel_content_top.add(hints);
+        panel_content_top.add(createSlot);
+
+
 //        add panel to frame
         frame.add(panel_btn);
+        frame.add(panel_welcome_info);
+        frame.add(panel_content_top);
+        frame.add(panel_content_bottom);
 //        frame.pack();
         frame.setVisible(true);
-        frame.setResizable(false);
+        frame.setResizable(true);
         windowClose(frame);
 
-
     }
-//    static class EventMonitor implements ActionListener{
-//        @Override
-//        public void actionPerformed(ActionEvent e){
-//            if (e.getActionCommand().equals("showAll")){
-//                System.out.println("1111111111111111");
-//                showAllSlot();
-//            } else if (e.getActionCommand().equals("findCar")){
-//                findACar(sc);
-//            }else if (e.getActionCommand().equals("parkCar")){
-//                parkACar(sc);
-//            }else if (e.getActionCommand().equals("deleteSlot")){
-//                deleteCarSlot(sc,parkingSlot);
-//            }else if (e.getActionCommand().equals("removeCar")){
-//                removeACar(sc);
-//            }else if (e.getActionCommand().equals("addParkingSlot")){
-//                addCarSlot1(sc, carPark);
-//            }else if (e.getActionCommand().equals("exitApplication")){
-//                System.exit(0);
-//            }
-//        }
-//    }
 
     static class ShowAllListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
             System.out.println("11111111111111111");
-
             showAllSlot();
         }
     }
@@ -167,12 +219,21 @@ public class GUIPanel extends JFrame{
         }
     }
 
-    static class AddParkingSlotListener implements ActionListener{
+    static class AddParkingSlotListener1 implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
             System.out.println("6666666666666666666666");
 
-            addCarSlot1(sc, carPark);
+            addCarSlot1(sc, carPark,frame);
+        }
+    }
+
+    static class AddParkingSlotListener2 implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e){
+            System.out.println("6666666666666666666666");
+
+            addCarSlot2(sc, carPark,frame);
         }
     }
 
