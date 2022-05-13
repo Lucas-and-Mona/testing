@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Scanner;
-
 import static carpark.Application.*;
 
 public class GUIPanel extends JFrame{
@@ -62,16 +61,16 @@ public class GUIPanel extends JFrame{
 //        welcomeLabel.setPreferredSize(new Dimension(200, 100));
 
         //labels for slots
-        labels = new JButton[28];
-
-        for (int i=0; i<28; i++){
-            labels[i] = new JButton();
-            labels[i].setPreferredSize(new Dimension(400,40));
-            labels[i].setBackground(new Color(171, 180, 207));
-            labels[i].setText("label"+i);
-            panel_content_bottom.add(labels[i]);
-            labels[i].setVisible(true);
-        }
+//        labels = new JButton[28];
+//
+//        for (int i=0; i<28; i++){
+//            labels[i] = new JButton();
+//            labels[i].setPreferredSize(new Dimension(400,40));
+//            labels[i].setBackground(new Color(171, 180, 207));
+//            labels[i].setText("label"+i);
+//            panel_content_bottom.add(labels[i]);
+//            labels[i].setVisible(true);
+//        }
 
 
 //        Define buttons and set sizes
