@@ -2,21 +2,16 @@ package carpark;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static carpark.GUIPanel.*;
-import static carpark.GUIPanel.frame;
-
 public class Application extends JFrame{
     static CarPark carPark = new CarPark();
     static ArrayList<ParkingSlot> parkingSlot = carPark.listAllSlots();
-    static ArrayList<JLabel> displaySlots = carPark.displaySlots();
+    static ArrayList<JButton> diplaySlots = new ArrayList<>();
+    static ArrayList<String> temporarilyStore = new ArrayList<>();
     static JFrame frame;
     static JPanel panel_content_top;
     static JPanel panel_content_bottom;
@@ -24,41 +19,46 @@ public class Application extends JFrame{
     static JPanel panel_btn;
     static JPanel panel_welcome_info;
     static JButton confirmCreate;
-    static JButton[] labels;
+    static JButton labels;
     static Scanner sc;
     static JTextField staffSlots;
     static JTextField visitorSlots;
     static JLabel hints;
+    static JPopupMenu jPopupMenu;
 
-    public Application(){
-        this.setVisible(true);
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        Container container = this.getContentPane();
-        container.setLayout(null);
-//        container.add(frame);
-    }
+//    public Application(){
+//        this.setVisible(true);
+//        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        Container container = this.getContentPane();
+//    }
 
     public static void main(String[] args){
-
 //        define frame and set sizes
         frame = new JFrame();
-        frame.setLayout(null);
-//        frame.setBounds(300, 300, 1000, 800);
-        frame.setMinimumSize(new Dimension(1000, 800));
+        frame.setSize(new Dimension(1000, 800));
         frame.setBackground(new Color(171, 180, 207));
+
+//        create a container for all Jpanel
+        Container contentPane = frame.getContentPane();
+        //        right click menu
+        jPopupMenu = new JPopupMenu("menu");
+        JMenuItem rightClickDelete = new JMenuItem("delete");
+
+        jPopupMenu.add(rightClickDelete);
 
 //        define panel container
         panel_btn = new JPanel();
         panel_welcome_info = new JPanel();
         panel_content_top = new JPanel();
         panel_content_bottom = new JPanel();
-        panel_content_bottom.setLayout(new FlowLayout());
+        JPanel right_panel = new JPanel();
+//        panel_content_bottom.setLayout(new FlowLayout());
 
-        panel_btn.setBounds(0, 0, 150, 800);
-        panel_welcome_info.setBounds(150, 0, 850, 100);
-        panel_content_top.setBounds(150, 100, 850, 100);
-        panel_content_bottom.setBounds(150, 400, 850, 500);
+        panel_btn.setPreferredSize(new Dimension(150, 800));
+        panel_welcome_info.setPreferredSize(new Dimension(850, 100));
+        panel_content_top.setPreferredSize(new Dimension(850, 100));
+        panel_content_bottom.setPreferredSize(new Dimension(850, 500));
+
         panel_btn.setBackground(new Color(147, 159, 197));
 
         panel_content_top.setBackground(new Color(141, 119, 140));
@@ -67,20 +67,8 @@ public class Application extends JFrame{
 
 //        define a label
         JLabel welcomeLabel = new JLabel("Welcome to lucas car park");
-        welcomeLabel.setBounds(160, 0, 200, 100);
+        welcomeLabel.setPreferredSize(new Dimension(200, 100));
 //        welcomeLabel.setPreferredSize(new Dimension(200, 100));
-
-        //labels for slots
-//        labels = new JButton[28];
-//
-//        for (int i=0; i<28; i++){
-//            labels[i] = new JButton();
-//            labels[i].setPreferredSize(new Dimension(400,40));
-//            labels[i].setBackground(new Color(171, 180, 207));
-//            labels[i].setText("label"+i);
-//            panel_content_bottom.add(labels[i]);
-//            labels[i].setVisible(true);
-//        }
 
 
 //        Define buttons and set sizes
@@ -92,6 +80,7 @@ public class Application extends JFrame{
         parkCar.setPreferredSize(new Dimension(140, 90));
         JButton deleteSlot = new JButton("Delete Slot");
         deleteSlot.setPreferredSize(new Dimension(140, 90));
+
         JButton removeCar = new JButton("Remove Car");
         removeCar.setPreferredSize(new Dimension(140, 90));
         JButton addParkingSlot = new JButton("Add Parking Slot");
@@ -104,8 +93,8 @@ public class Application extends JFrame{
 //      create multiple input window
         createSlot = new JPanel();
         createSlot.setBackground(new Color(237, 219, 235));
-        createSlot.setBounds(150, 250, 790, 200);
-        createSlot.setLayout(new FlowLayout());
+        createSlot.setPreferredSize(new Dimension(790, 50));
+//        createSlot.setLayout(new FlowLayout());
         JLabel newStaff = new JLabel("Staff slot quantity: ");
         newStaff.setPreferredSize(new Dimension(150, 30));
         JLabel newVisitor = new JLabel("Visitor slot quantity: ");
@@ -124,7 +113,7 @@ public class Application extends JFrame{
         visitorSlots.setBackground(new Color(237, 202, 235));
         visitorSlots.setPreferredSize(new Dimension(160, 30));
 
-        createSlot.add(hints, BorderLayout.NORTH);
+        createSlot.add(hints);
         createSlot.add(newStaff);
         createSlot.add(staffSlots);
         createSlot.add(Box.createHorizontalStrut(20));
@@ -160,6 +149,9 @@ public class Application extends JFrame{
         AddParkingSlotListener1 addParkingSlotListener1 = new AddParkingSlotListener1();
         confirmCreate.addActionListener(addParkingSlotListener1);
 
+        rightClickDeleteListener rightClickDeleteListener = new rightClickDeleteListener();
+        rightClickDelete.addMouseListener(rightClickDeleteListener);
+
 
 //        add buttons to panel
         panel_btn.add(showAll);
@@ -175,15 +167,15 @@ public class Application extends JFrame{
         panel_content_top.add(hints);
         panel_content_top.add(createSlot);
 
-
-//        add panel to frame
-        frame.add(panel_btn);
-        frame.add(panel_welcome_info);
-        frame.add(panel_content_top);
-        frame.add(panel_content_bottom);
-//        frame.pack();
+//        add panel to contentpane
+        contentPane.add(panel_btn, BorderLayout.WEST);
+        right_panel.setLayout(new BorderLayout());
+        right_panel.add(panel_welcome_info, BorderLayout.NORTH);
+        right_panel.add(panel_content_top, BorderLayout.CENTER);
+        right_panel.add(panel_content_bottom, BorderLayout.SOUTH);
+        contentPane.add(right_panel, BorderLayout.EAST);
+        frame.pack();
         frame.setVisible(true);
-        frame.setResizable(true);
         windowClose(frame);
 
     }
@@ -200,7 +192,7 @@ public class Application extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e){
             System.out.println("222222222222222222222");
-            findACar(sc);
+            findACar();
         }
     }
 
@@ -208,7 +200,7 @@ public class Application extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e){
             System.out.println("33333333333333333333333");
-            parkACar(sc);
+            parkACar();
         }
     }
 
@@ -216,7 +208,7 @@ public class Application extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e){
             System.out.println("444444444444444444444444444444");
-            deleteCarSlot(sc,parkingSlot);
+            deleteCarSlot(parkingSlot);
         }
     }
 
@@ -224,7 +216,7 @@ public class Application extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e){
             System.out.println("55555555555555555555555555");
-            removeACar(sc);
+            removeACar();
         }
     }
 
@@ -233,7 +225,7 @@ public class Application extends JFrame{
         public void actionPerformed(ActionEvent e){
             System.out.println("6666666666666666666666");
 
-            addCarSlot1(sc, carPark,frame);
+            addCarSlot1(sc, carPark,frame,jPopupMenu);
         }
     }
 
@@ -242,7 +234,7 @@ public class Application extends JFrame{
         public void actionPerformed(ActionEvent e){
             System.out.println("6666666666666666666666");
 
-            addCarSlot2(sc, carPark,frame);
+            addCarSlot2(carPark,frame);
         }
     }
 
@@ -261,6 +253,49 @@ public class Application extends JFrame{
         }
     }
 
+    static class RightClickPopup extends JPopupMenu {
+        JMenuItem jMenuItem;
+        public RightClickPopup(){
+            jMenuItem = new JMenuItem("delete");
+            add(jMenuItem);
+        }
+    }
+
+
+    static class rightClickDeleteListener implements MouseListener{
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            String slot = temporarilyStore.get(0);
+            System.out.println(slot);
+            rightClickDelete(slot);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e){
+            String slot = temporarilyStore.get(0);
+            System.out.println(slot);
+            rightClickDelete(slot);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            String slot = temporarilyStore.get(0);
+            System.out.println(slot);
+            rightClickDelete(slot);
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
     private static void windowClose(Frame frame){
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -273,7 +308,7 @@ public class Application extends JFrame{
     class showAllDialog extends JDialog{
         public showAllDialog(){
             this.setVisible(true);
-            this.setBounds(300, 300, 400, 300);
+            this.setPreferredSize(new Dimension(400, 300));
             this.setTitle("staff parking");
 
             Container container = this.getContentPane();
@@ -283,61 +318,10 @@ public class Application extends JFrame{
         }
     }
 
-//    public static void selectMenu(){
-//        Scanner sc = new Scanner(System.in);
-//        addCarSlot1(sc,carPark, frame);
-//        while (true) {
-//            System.out.println("1: List all car slots");
-//            System.out.println("2: Park a car");
-//            System.out.println("3: Find a car");
-//            System.out.println("4: Remove a car");
-//            System.out.println("5: Add a car slot");
-//            System.out.println("6: Delete a car slot");
-//            System.out.println("7: Exit");
-//            System.out.println();
-//            System.out.println("Please select an option (1-7):");
-//            String commandFormat = "^[1-7]{1}$";
-//            String command = sc.next();
-//            boolean flag = command.matches(commandFormat);
-//            boolean flag2 =true;
-//
-//            if (flag) {
-//                int option = Integer.valueOf(command);
-//                switch (option) {    //use the command user input
-//                    case 1:
-//                        showAllSlot();    //call showAllSlot method
-//                        break;
-//                    case 2:
-//                        parkACar(sc);    //call parkACar method
-//                        break;
-//                    case 3:
-//                        findACar(sc);   //call findACarResult method
-//                        break;
-//                    case 4:
-//                        removeACar(sc);    //call removeCarResult method
-//                        break;
-//                    case 5:
-//                        addCarSlot2(sc,carPark, frame);    //call addCarSlot method
-//                        break;
-//                    case 6:
-//                        deleteCarSlot(sc,parkingSlot);    //call deleteCarSlot method
-//                        break;
-//                    case 7:
-//                        System.out.println("Thank you for using, the system is now end.");
-//                        return;
-//                    default:
-//                        System.out.println("Please only type a number among 1-7.");
-//                }
-//            }else {
-//                System.out.println("Please only type 1 to 7 to choose.");
-//            }
-//        }
-//    }
-
     public static void showAllSlot() {
         for (int i = 0; i < parkingSlot.size(); i++) {
 //            if (parkingSlot.get(i).getCar()==null) {
-                labels[i].setVisible(true);
+                labels.setVisible(true);
 //                new JButton("SlotID is: " + parkingSlot.get(i).getSlot_id() + ", is for " + parkingSlot.get(i).getSlotType()
 //                        + ", and is " + parkingSlot.get(i).getOccupation() + ".").setPreferredSize(new Dimension(120, 100));
 //
@@ -364,7 +348,7 @@ public class Application extends JFrame{
         }
     }
 
-    public static void parkACar(Scanner sc) {
+    public static void parkACar() {
 //        System.out.println("Please enter your car details to park the car:");
         JOptionPane.showMessageDialog(frame,
                 "Please enter your car details to park the car:",
@@ -388,7 +372,6 @@ public class Application extends JFrame{
                 flag1 = false;
             }
         }
-
 
         String ownerName = null;
         boolean flag2 = true;
@@ -454,7 +437,6 @@ public class Application extends JFrame{
             }
         }
 
-
         String slotNumber = null;
         boolean flag3 = true;
         while (flag3) {
@@ -501,7 +483,7 @@ public class Application extends JFrame{
             if (slotNumber.equals(parkingSlot.get(i).getSlot_id())){
                 parkingSlot.get(i).setCar(new Car(carNumber,ownerName,slotType));
                 parkingSlot.get(i).setOccupation("occupied");
-                labels[i].setBackground(new Color(200, 170, 198));
+
 //                System.out.println("You have successfully park the car " + parkingSlot.get(i).getCar().getRegistrationNumber() + " into slot " + parkingSlot.get(i).getSlot_id() + ".");
                 JOptionPane.showMessageDialog(frame,
                         "You have successfully park the car " + parkingSlot.get(i).getCar().getRegistrationNumber() + " into slot " + parkingSlot.get(i).getSlot_id() + ".",
@@ -512,7 +494,7 @@ public class Application extends JFrame{
         }
     }
 
-    public static void findACar(Scanner sc) {
+    public static void findACar() {
         String searchCar = null;
         boolean flag1 = true;
         while (flag1) {
@@ -538,9 +520,7 @@ public class Application extends JFrame{
         }
     }
 
-
-
-    public static void removeACar(Scanner sc) {
+    public static void removeACar() {
         String searchCar = null;
         boolean flag5 = true;
         while (flag5) {
@@ -582,22 +562,7 @@ public class Application extends JFrame{
     }
 
 
-    public static void addCarSlot1(Scanner sc, CarPark carPark, Frame frame) {
-//        int staffSlot = Integer.parseInt(JOptionPane.showInputDialog(frame,
-//                "Please enter the number of slots for staff: ",
-//                "Create staff slots",
-//                JOptionPane.INFORMATION_MESSAGE
-//                ));
-//        int visitorSlot = Integer.parseInt(JOptionPane.showInputDialog(frame,
-//                "Please enter the number of slots for visitor: ",
-//                "Create visitor slots",
-//                JOptionPane.INFORMATION_MESSAGE
-//        ));
-
-//        System.out.println("Please enter the number of slots for staff: ");
-//        int staffSlot = sc.nextInt();
-//        System.out.println("Please enter the number of slots for staff: ");
-//        int visitorSlot = sc.nextInt();
+    public static void addCarSlot1(Scanner sc, CarPark carPark, Frame frame, JPopupMenu jPopupMenu) {
 
             int staffSlot = Integer.parseInt(staffSlots.getText());
             int visitorSlot = Integer.parseInt(visitorSlots.getText());
@@ -608,25 +573,48 @@ public class Application extends JFrame{
                     String slot_id = String.format("S"+"%03d",(i+1));
                     String slotType = "staff";
                     carPark.addASlot(new ParkingSlot(slot_id, occupation, slotType, car));
-                    labels[i].setText("SlotID: " + parkingSlot.get(i).getSlot_id() + " Slot type:" + parkingSlot.get(i).getSlotType()
+                    labels = new JButton();
+                    labels.setText("SlotID: " + parkingSlot.get(i).getSlot_id() + " Slot type:" + parkingSlot.get(i).getSlotType()
                             + " Status: " + parkingSlot.get(i).getOccupation() + ".");
-                    labels[i].setVisible(true);
-                    labels[i].setBackground(new Color(130, 146, 195));
+                    labels.setVisible(true);
+                    labels.setPreferredSize(new Dimension(410,90));
+                    labels.setBackground(new Color(130, 146, 195));
+                    labels.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            showPopup(e);
+                        }
+                    });
+                    labels.setName(slot_id);
+                    diplaySlots.add(labels);
+                    panel_content_bottom.add(diplaySlots.get(i));
                 }
 
                 for (int i = 0; i < visitorSlot; i++) {
                     String slot_id = String.format("V"+"%03d",(i+1));
                     String slotType = "visitor";
                     carPark.addASlot(new ParkingSlot(slot_id, occupation, slotType, car));
-                    labels[i+staffSlot].setText("SlotID: " + parkingSlot.get(i+staffSlot).getSlot_id() + " Slot type: " + parkingSlot.get(i+staffSlot).getSlotType()
+                    labels = new JButton();
+                    labels.setText("SlotID: " + parkingSlot.get(i+staffSlot).getSlot_id() + " Slot type: " + parkingSlot.get(i+staffSlot).getSlotType()
                             + " Status: " + parkingSlot.get(i+staffSlot).getOccupation() + ".");
-                    labels[i+staffSlot].setVisible(true);
-                    labels[i+staffSlot].setBackground(new Color(181, 202, 151));
+                    labels.setVisible(true);
+                    labels.setPreferredSize(new Dimension(410,90));
+                    labels.setBackground(new Color(181, 202, 151));
+                    labels.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            showPopup(e);
+                        }
+                    });
+                    labels.setName(slot_id);
+                    System.out.println(labels.getName());
+                    diplaySlots.add(labels);
+                    panel_content_bottom.add(diplaySlots.get(i+staffSlot));
                 }
                 createSlot.setVisible(false);
                 hints.setVisible(false);
-                panel_content_top.setBounds(150, 100, 850, 0);
-                panel_content_bottom.setBounds(150, 100, 850, 700);
+                panel_content_top.setPreferredSize(new Dimension(850, 0));
+                panel_content_bottom.setPreferredSize(new Dimension(850, 700));
             } else {
                 JOptionPane.showMessageDialog(frame,
                         "Sorry, we don't have enough space for more than 28 car slots, please create less than 28 slots.",
@@ -635,8 +623,17 @@ public class Application extends JFrame{
                 );
             }
     }
+    static void showPopup(MouseEvent e) {
+        temporarilyStore.clear();
+        if(e.isPopupTrigger()) {
+            jPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+            System.out.println(e.getComponent().getName());
+        }
+        String clickSlotId = e.getComponent().getName();
+        temporarilyStore.add(clickSlotId);
+    }
 
-    public static void addCarSlot2(Scanner sc, CarPark carPark, Frame frame) {
+    public static void addCarSlot2(CarPark carPark, Frame frame) {
         if (parkingSlot.size()<= 28){
         } else {
             JOptionPane.showMessageDialog(frame,
@@ -720,15 +717,55 @@ public class Application extends JFrame{
         }
     }
 
+    public static void rightClickDelete(String clickSlotId){
+        String slot_Id = clickSlotId ;
+        System.out.println("testing " + slot_Id);
+        for (int i = 0; i < parkingSlot.size(); i++) {
+            if (slot_Id.equals(parkingSlot.get(i).getSlot_id())) {
+                if (parkingSlot.get(i).getCar() == null) {
+                    JOptionPane.showMessageDialog(frame,
+                            "You have successfully removed " + parkingSlot.get(i) + ".",
+                            "Successfully deleted",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                    parkingSlot.remove(i);
+                    diplaySlots.get(i).setVisible(false);
+                    panel_content_bottom.remove(diplaySlots.get(i));
+                    diplaySlots.remove(i);
+                } else {
+//
+                    JOptionPane.showMessageDialog(frame,
+                            "Sorry, the slot is now parking a car, remove the car before deleting the slot.",
+                            "Successfully deleted",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
 
-    public static void deleteCarSlot (Scanner sc, ArrayList < ParkingSlot > parkingSlot){
+                    Object[] choices = {"do it again", "Quit"};
+                    String choice = (String) JOptionPane.showInputDialog(frame,
+                            "Do you want to try again or quit?",
+                            "Next step",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            choices, choices[0]
+                    );
+
+                    if (choice != null && choice.length() > 0) {
+                        if (choice.equals("do it again")) {
+                            continue;
+                        } else return;
+                    }
+                }
+            }
+        }
+
+    }
+
+    public static void deleteCarSlot (ArrayList < ParkingSlot > parkingSlot){
         boolean flag1 = true;
         boolean flag2 = true;
         String slotId = null;
         while (flag2) {
             while (flag1) {
-//                System.out.println("Please enter the slot number you want to delete, must looks like \"S001\" or \"V001\"");
-//                slotId = sc.next().toUpperCase();
                 slotId = JOptionPane.showInputDialog(frame,
                         "Please enter the slot number you want to delete, must looks like \"S001\" or \"V001\"",
                         "Delete a slot",
@@ -751,6 +788,10 @@ public class Application extends JFrame{
                                 JOptionPane.INFORMATION_MESSAGE
                         );
                         parkingSlot.remove(i);
+                        diplaySlots.get(i).setVisible(false);
+                        panel_content_bottom.remove(diplaySlots.get(i));
+                        diplaySlots.remove(i);
+
 //                        labels[i].setText("label"+i);
 //                        labels[i].setVisible(false);
                         flag2 = false;
