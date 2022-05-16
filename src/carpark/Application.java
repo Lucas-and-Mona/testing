@@ -52,7 +52,7 @@ public class Application extends JFrame{
         panel_welcome_info.setLayout(new BorderLayout());
         contentPane.setLayout(new BorderLayout());
         createSlot.setLayout(new GridLayout(2,5));
-        panel_content_bottom.setLayout(new GridLayout(2, 2));
+        panel_content_bottom.setLayout(new GridLayout(3, 3));
         panel_content_top.setLayout(new FlowLayout());
 
 
@@ -61,7 +61,7 @@ public class Application extends JFrame{
         panel_btn.setPreferredSize(new Dimension(150, 800));
         panel_welcome_info.setPreferredSize(new Dimension(WIDTH, 50));
         panel_content_top.setPreferredSize(new Dimension(850, 500));
-        panel_content_bottom.setPreferredSize(new Dimension(850, 100));
+        panel_content_bottom.setPreferredSize(new Dimension(850, 150));
         welcomeLabel.setPreferredSize(new Dimension(200, 100));
         createSlot.setPreferredSize(new Dimension(790, 50));
 
@@ -337,7 +337,7 @@ public class Application extends JFrame{
     public static void showAllSlot() {
         for (int i = 0; i < diplaySlots.size(); i++) {
             diplaySlots.get(i).setVisible(true);
-
+            System.out.println(diplaySlots);
         }
     }
 
@@ -360,7 +360,7 @@ public class Application extends JFrame{
                 );
                 if (carNumber == null) {
                     operationCancelled();
-                    flag5 = false;
+                    return;
                 } else {
                     String registrationNumberFormat = "^[A-Z][0-9]{5}$";
                     if (carNumber.matches(registrationNumberFormat)) {
@@ -379,7 +379,7 @@ public class Application extends JFrame{
                 );
                 if (ownerName == null){
                     operationCancelled();
-                    flag5 = false;
+                    return;
                 } else {
                     String ownerNameFormat = "^[A-Za-z]{1,20}$";
                     if (ownerName.matches(ownerNameFormat)) {
@@ -439,7 +439,7 @@ public class Application extends JFrame{
                 );
                 if (slotNumber == null){
                     operationCancelled();
-                    flag5 = false;
+                    return;
                 } else {
                     for (int i = 0; i < parkingSlot.size(); i++) {
                         if (slotNumber.equals(parkingSlot.get(i).getSlot_id())) {
@@ -486,6 +486,7 @@ public class Application extends JFrame{
                             "Successfully Parked",
                             JOptionPane.INFORMATION_MESSAGE
                     );
+                    flag5 = false;
                 }
             }
         }
@@ -646,10 +647,9 @@ public class Application extends JFrame{
                     );
                     if (slotNumber == null) {
                         operationCancelled();
-                        flag2 = false;
+                        return;
                     } else {
                         System.out.println("22222222222222222222");
-
                         String registrationNumberFormat = "^[SV][0-9]{3}$";
                         if (slotNumber.matches(registrationNumberFormat)) {
                             for (int i = 0; i < parkingSlot.size(); i++) {
@@ -662,7 +662,14 @@ public class Application extends JFrame{
                                     System.out.println("111111111111");
                                     break;
                                 } else {
-                                    flag2 = false;
+                                    if (slotNumber.contains("S")) {
+                                        slotType = "staff";
+                                        addSlotAfterChecked(slotNumber, slotType);
+                                    } else {
+                                        slotType = "visitor";
+                                        addSlotAfterChecked(slotNumber, slotType);
+                                    }
+                                   return;
                                 }
                             }
                         } else {
@@ -673,41 +680,6 @@ public class Application extends JFrame{
                             );
                         }
                     }
-                }
-                if (slotNumber.contains("S")) {
-                    slotType = "staff";
-                    addSlotAfterChecked(slotNumber, slotType);
-//                    Object[] choices = {"create more", "Quit"};
-//                    String choice = (String) JOptionPane.showInputDialog(frame,
-//                            "Choose continue to create more slot or quit.",
-//                            "Next step",
-//                            JOptionPane.PLAIN_MESSAGE,
-//                            null,
-//                            choices, choices[0]
-//                    );
-//
-//                    if (choice != null && choice.length()>0){
-//                        if (choice.equals("create more")){
-//                            continue;
-//                        }else return;
-//                    }
-                } else {
-                    slotType = "visitor";
-                    addSlotAfterChecked(slotNumber, slotType);
-//                    Object[] choices = {"create more", "Quit"};
-//                    String choice = (String) JOptionPane.showInputDialog(frame,
-//                            "Choose continue to create more slot or quit.",
-//                            "Next step",
-//                            JOptionPane.PLAIN_MESSAGE,
-//                            null,
-//                            choices, choices[0]
-//                    );
-//
-//                    if (choice != null && choice.length()>0){
-//                        if (choice.equals("create more")){
-//                            continue;
-//                        }else return;
-//                    }
                 }
         } else {
             JOptionPane.showMessageDialog(frame,
@@ -724,11 +696,17 @@ public class Application extends JFrame{
         ParkingSlot newSlot = new ParkingSlot(newSlotId, occupation, newSlotType, car);
         carPark.addASlot(newSlot);
         labels = new JButton();
-        labels.setText("SlotID: " + parkingSlot.get(parkingSlot.size()-1).getSlot_id() + " Slot type: " + parkingSlot.get(parkingSlot.size()-1).getSlotType()
-                + " Status: " + parkingSlot.get(parkingSlot.size()-1).getOccupation() + ".");
+        String content1 = "<html>" + "<body>" + "SlotID: " + newSlotId + " Slot type: " + newSlotType;
+        String content2 = " ,Status: " + occupation + "." + "</body></html>";
+        labels.setText(content1 + content2);
         labels.setVisible(true);
-        labels.setPreferredSize(new Dimension(400,80));
-        labels.setBackground(new Color(181, 202, 151));
+        labels.setPreferredSize(new Dimension(300,80));
+        if (newSlotType == "staff"){
+            labels.setBackground(new Color(130, 146, 195));
+        }else {
+            labels.setBackground(new Color(181, 202, 151));
+        }
+
         labels.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -738,12 +716,16 @@ public class Application extends JFrame{
         labels.setName(newSlotId);
         System.out.println(labels.getName());
         diplaySlots.add(labels);
-        panel_content_bottom.add(diplaySlots.get(parkingSlot.size()-1));
+        panel_content_top.add(diplaySlots.get(diplaySlots.size()-1));
+        panel_content_top.revalidate();
+        panel_content_top.repaint();
+        System.out.println(diplaySlots.get(diplaySlots.size()-1));
         JOptionPane.showMessageDialog(frame,
                 "You have successfully created a new " + newSlot.getSlotType() + " slot " + newSlot.getSlot_id() + ".",
                 "Successfully created",
                 JOptionPane.INFORMATION_MESSAGE
         );
+
         System.out.println(parkingSlot);
         System.out.println(diplaySlots);
     }
