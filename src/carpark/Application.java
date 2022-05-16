@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class Application extends JFrame{
     static CarPark carPark = new CarPark();
@@ -15,7 +14,6 @@ public class Application extends JFrame{
     static JFrame frame;
     static JPanel panel_content_top,panel_content_bottom,createSlot,panel_btn,panel_welcome_info;
     static JButton confirmCreate,labels;
-    static Scanner sc;
     static JTextField staffSlots,visitorSlots;
     static JLabel hints;
     static JPopupMenu jPopupMenu;
@@ -152,13 +150,11 @@ public class Application extends JFrame{
 
     public static void main(String[] args){
         new Application();
-
     }
 
     static class ShowAllListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("11111111111111111");
             showAllSlot();
         }
     }
@@ -166,7 +162,6 @@ public class Application extends JFrame{
     static class FindCarListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("222222222222222222222");
             findACar();
         }
     }
@@ -190,7 +185,6 @@ public class Application extends JFrame{
     static class RemoveCarListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("55555555555555555555555555");
             removeACar();
         }
     }
@@ -198,17 +192,13 @@ public class Application extends JFrame{
     static class AddParkingSlotListener1 implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("6666666666666666666666");
-
-            addCarSlot1(sc, carPark,frame,jPopupMenu);
+            addCarSlot1(carPark,frame,jPopupMenu);
         }
     }
 
     static class AddParkingSlotListener2 implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("6666666666666666666666");
-
             addCarSlot2(carPark,frame);
         }
     }
@@ -216,15 +206,7 @@ public class Application extends JFrame{
     static class ExitApplicationListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            System.out.println("7777777777777777777777777777");
             System.exit(0);
-        }
-    }
-
-    static class ClearScreenListener implements ActionListener{
-        @Override
-        public void actionPerformed(ActionEvent e){
-            System.out.println("8888888888888888888888888888888");
         }
     }
 
@@ -336,8 +318,9 @@ public class Application extends JFrame{
 
     public static void showAllSlot() {
         for (int i = 0; i < diplaySlots.size(); i++) {
+            panel_content_top.revalidate();
+            panel_content_top.repaint();
             diplaySlots.get(i).setVisible(true);
-            System.out.println(diplaySlots);
         }
     }
 
@@ -497,27 +480,49 @@ public class Application extends JFrame{
         boolean flag1 = true;
         while (flag1) {
             searchCar = JOptionPane.showInputDialog(frame,
-                    "Please enter a car number for removing, must looks like \\\"A12345\\\"",
+                    "Please enter a car number for removing, must looks like \"A12345\"",
                     "Find the car number",
                     JOptionPane.OK_CANCEL_OPTION
             );
             if (searchCar == null){
                 operationCancelled();
-                flag1 = false;
+                return;
             } else {
                 String registrationNumberFormat = "^[A-Z][0-9]{5}$";
                 if (searchCar.matches(registrationNumberFormat)){
-                    flag1 =false;
-                }
-            }
-            for (int i = 0; i < parkingSlot.size(); i++) {
-                if (parkingSlot.get(i).getCar() != null) {
-                    if (Objects.equals(parkingSlot.get(i).getCar().getRegistrationNumber(), searchCar)) {
-                        System.out.println(parkingSlot.get(i).getCar().toString());
+                    for (int i = 0; i < parkingSlot.size(); i++) {
+                        if (parkingSlot.get(i).getCar() != null) {
+                            if (Objects.equals(parkingSlot.get(i).getCar().getRegistrationNumber(), searchCar)) {
+                                System.out.println(parkingSlot.get(i).getCar().toString()+ " is now parking in "+ parkingSlot.get(i).getSlot_id()+".");
+                                return;
+                            }else if (!Objects.equals(parkingSlot.get(i).getCar().getRegistrationNumber(), searchCar) && i == (parkingSlot.size()-1)){
+                                JOptionPane.showMessageDialog(frame,
+                                        "The car you have search was not found, try again.",
+                                        "No car found",
+                                        JOptionPane.INFORMATION_MESSAGE
+                                );
+                            } else {
+
+                            }
+                        }else if (parkingSlot.get(i).getCar() == null && i ==(parkingSlot.size()-1)){
+                            JOptionPane.showMessageDialog(frame,
+                                    "The car you have search was not found, try again.",
+                                    "No car found",
+                                    JOptionPane.INFORMATION_MESSAGE
+                            );
+                            continue;
+                        }
                     }
+                }else {
+//                    System.out.println("Format error, please try again.");
+                    JOptionPane.showMessageDialog(frame,
+                            "Format must looks like \"A00005\", please try again.",
+                            "Format error",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
                 }
             }
-            }
+        }
     }
 
     public static void removeACar() {
@@ -546,13 +551,29 @@ public class Application extends JFrame{
                                 "No car in the slot",
                                 JOptionPane.INFORMATION_MESSAGE
                         );
+                        String content1 = "<html>" + "<body>" + "SlotID: " + parkingSlot.get(i).getSlot_id() + " Slot type: " + parkingSlot.get(i).getSlotType();
+                        String content2 = " ,Status: " + parkingSlot.get(i).getOccupation() + "." + "</body></html>";
+                        diplaySlots.get(i).setText(content1 + content2);
                         parkingSlot.get(i).setCar(null);
+                        if (parkingSlot.get(i).getSlotType() == "staff"){
+                            diplaySlots.get(i).setBackground(new Color(130, 146, 195));
+                        }else {
+                            diplaySlots.get(i).setBackground(new Color(181, 202, 151));
+                        }
+                        panel_content_top.revalidate();
+                        panel_content_top.repaint();
                         parkingSlot.get(i).setOccupation("not occupied");
+                        return;
+                    }else if (!Objects.equals(parkingSlot.get(i).getCar().getRegistrationNumber(), searchCar) && i == (parkingSlot.size()-1)){
+                        JOptionPane.showMessageDialog(frame,
+                                "Sorry, No such car park in here, try another one.",
+                                "No car in the slot",
+                                JOptionPane.INFORMATION_MESSAGE
+                        );
                     }
-                } else {
-//                System.out.println("No car park in here.");
+                } else if (parkingSlot.get(i).getCar() == null && i ==(parkingSlot.size()-1)){
                     JOptionPane.showMessageDialog(frame,
-                            "Sorry, No car park in here, try another one.",
+                            "Sorry, No such car park in here, try another one.",
                             "No car in the slot",
                             JOptionPane.INFORMATION_MESSAGE
                     );
@@ -561,7 +582,7 @@ public class Application extends JFrame{
         }
     }
 
-    public static void addCarSlot1(Scanner sc, CarPark carPark, Frame frame, JPopupMenu jPopupMenu) {
+    public static void addCarSlot1(CarPark carPark, Frame frame, JPopupMenu jPopupMenu) {
 
             int staffSlot = Integer.parseInt(staffSlots.getText());
             int visitorSlot = Integer.parseInt(visitorSlots.getText());
@@ -649,7 +670,6 @@ public class Application extends JFrame{
                         operationCancelled();
                         return;
                     } else {
-                        System.out.println("22222222222222222222");
                         String registrationNumberFormat = "^[SV][0-9]{3}$";
                         if (slotNumber.matches(registrationNumberFormat)) {
                             for (int i = 0; i < parkingSlot.size(); i++) {
@@ -659,7 +679,6 @@ public class Application extends JFrame{
                                             "Existed slot number",
                                             JOptionPane.INFORMATION_MESSAGE
                                     );
-                                    System.out.println("111111111111");
                                     break;
                                 } else {
                                     if (slotNumber.contains("S")) {
@@ -848,6 +867,4 @@ public class Application extends JFrame{
                 JOptionPane.INFORMATION_MESSAGE
         );
     }
-
-
 }
